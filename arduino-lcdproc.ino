@@ -19,19 +19,29 @@ Arduino code based on liquid crystal library + lcdproc source code
 
 */
 
+
 // include the library code:
 #include <LiquidCrystal.h>
 
+// UART config
+const int baud = 9600;
+const int escapeByte = 0xFE;
+
+// display pinning & dimensions
+const int rs = 12, en = 11, d4 = 5, d5 = 4, d6 = 3, d7 = 2;
+const int rows = 2;
+const int colums = 20;
+
 // initialize the library by associating any needed LCD interface pin
 // with the arduino pin number it is connected to
-const int rs = 12, en = 11, d4 = 5, d5 = 4, d6 = 3, d7 = 2;
 LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
 
 void setup() {
   // set up the LCD's number of columns and rows:
-  lcd.begin(20, 2);
+  lcd.begin(colums, rows);
+  
   // initialize the serial communications:
-  Serial.begin(9600);
+  Serial.begin(baud);
 
   // give hint on how to send data to display
   lcd.clear();
@@ -39,7 +49,6 @@ void setup() {
   lcd.setCursor(0,1);
   lcd.print("lcdserializer");
 }
-
 
 // for instruction escape logic
 uint8_t c = 0xFF;
@@ -55,18 +64,18 @@ void loop()
     timeoutCounter+=1;
     if((timeoutCounter>2000000) && (timeoutCounter%1000)==0)
     {
-        lcd.clear();
-        lcd.print("no data since ");
-        lcd.setCursor(0,1);
-        int seconds = ((millis()/1000) - lastTimeReception);
+        // calculate time
+        int seconds = ((millis()/1000) - lastTimeReception); // overflow might happen!
         int minutes = seconds/60;
         int hours = minutes/60;
         seconds = seconds%60;
         minutes = minutes%60;
-
         char timestring[20];
         snprintf(timestring,20,"%04d:%02d:%02d",hours,minutes,seconds);
-        
+
+        lcd.clear();
+        lcd.print("no data since ");
+        lcd.setCursor(0,1);        
         lcd.print(timestring);
     }
 
@@ -82,12 +91,10 @@ void loop()
         {
             instructionEscape = false;
             lcd.command(c);
-  
         }
         else
         {
-        
-            if((c == 0xFE) ) // command escape character
+            if((c == escapeByte) ) // command escape character
             {
                 instructionEscape = true;
             }
@@ -97,5 +104,4 @@ void loop()
             }  
         }
     }
-  
 }
