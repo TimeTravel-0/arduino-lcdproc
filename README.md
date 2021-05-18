@@ -1,6 +1,9 @@
 # arduino-lcdproc
 small arduino sketch to interface with lcdproc and drive a hd44780 compatible display
 
+![hardware front view](photo_2021-05-18_14-51-21.jpg?raw=true "front view")
+![hardware back view](photo_2021-05-18_14-51-28.jpg?raw=true "back view")
+
 To make this work the following parts are needed
 - LCDproc itself creates/provides the content to be displayed --> config file provided
 - LCDproc / LCDd is a deamon accepting data via TCP and forwarding it to a connected display --> config file provided
